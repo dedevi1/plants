@@ -1,20 +1,36 @@
+const CACHE_NAME = "plants-cache-v2"
+
 self.addEventListener("install", function(event) {
     event.waitUntil(
-        caches.open("plants-cache").then(function(cache) {
+        caches.open(CACHE_NAME).then(function(cache) {
             return cache.addAll([
                 "./",
                 "./index.html",
-                "./style.css",
+                "./style.css?v=999",
                 "./manifest.json"
             ])
         })
     )
 })
 
+self.addEventListener("activate", function(event) {
+    event.waitUntil(
+        caches.keys().then(function(names) {
+            return Promise.all(
+                names.map(function(name) {
+                    if (name !== CACHE_NAME) {
+                        return caches.delete(name)
+                    }
+                })
+            )
+        })
+    )
+})
+
 self.addEventListener("fetch", function(event) {
     event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request)
+        fetch(event.request).catch(function() {
+            return caches.match(event.request)
         })
     )
 })
