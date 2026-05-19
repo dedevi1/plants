@@ -128,10 +128,10 @@ ul {
 }
 
 .plant-name {
-    color: lime;
+    color: #7CFFB2;
     font-weight: bold;
-    text-shadow: 0 0 8px lime;
-    text-shadow: 0 0 8px lime;
+    color: #7CFFB2;
+    text-shadow: 0 0 10px #7CFFB2;
     font-size: 20px;
 }
 
