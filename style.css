@@ -5,6 +5,9 @@ body {
     color: #eafff3;
 }
 
+.plant-name {
+    color: lime;
+    
 .board {
     max-width: 760px;
     margin: 20px auto;
