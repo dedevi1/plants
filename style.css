@@ -54,11 +54,19 @@ body {
     box-shadow: none;
 }
 
-h1 {
+h1, h2 {
     text-align: center;
     letter-spacing: 2px;
     text-transform: uppercase;
+}
+
+h1 {
     font-size: 24px;
+}
+
+h2 {
+    font-size: 18px;
+    margin-top: 10px;
 }
 
 .panel {
@@ -72,7 +80,8 @@ h1 {
     gap: 10px;
 }
 
-input {
+input,
+select {
     width: 100%;
     background: #111;
     color: lime;
@@ -116,17 +125,12 @@ ul {
 }
 
 .plant-info {
-    flex: 1;
     line-height: 1.6;
 }
 
 .plant-name {
-    color: #A8FFCE;
+    color: lime;
     font-weight: bold;
-    text-shadow:
-        0 0 6px #A8FFCE,
-        0 0 12px #7CFFB2,
-        0 0 20px #7CFFB2;
     font-size: 20px;
 }
 
@@ -143,9 +147,72 @@ ul {
 }
 
 .good {
-    color: lime;
+    color: #A8FFCE;
     font-weight: bold;
-    text-shadow: 0 0 8px lime;
+    text-shadow:
+        0 0 6px #A8FFCE,
+        0 0 12px #7CFFB2,
+        0 0 20px #7CFFB2;
+}
+
+.warning {
+    color: yellow;
+    font-weight: bold;
+}
+
+.plant-card:has(.warning),
+.map-plant:has(.warning) {
+    border-color: yellow;
+}
+
+
+.map {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.room {
+    background: #052d1f;
+    border: 2px solid #19ff9c;
+    border-radius: 14px;
+    padding: 15px;
+    box-shadow:
+        inset 0 0 20px rgba(0,0,0,0.4),
+        0 0 10px rgba(25,255,156,0.2);
+}
+
+.room-title {
+    color: #A8FFCE;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 0 0 8px #7CFFB2;
+}
+
+.map-plant {
+    background: #063b28;
+    border: 1px solid #d6b64c;
+    border-radius: 8px;
+    padding: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.empty-room {
+    color: #9fb8aa;
+    font-size: 14px;
+}
+
+.led.yellow {
+    background: yellow;
+    box-shadow: 0 0 18px yellow;
+}
+
+.room,
+.map-plant,
+.plant-card {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 @media (max-width: 600px) {
@@ -157,5 +224,4 @@ ul {
     h1 {
         font-size: 20px;
     }
-}
 }
