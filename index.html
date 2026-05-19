@@ -233,6 +233,9 @@ function showPlants() {
         greenLed.classList.remove("off")
     }
 }
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+}
 
 function exportTxt() {
 
