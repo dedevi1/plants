@@ -1,0 +1,9 @@
+{
+  "name": "Pflanzen Controller",
+  "short_name": "Pflanzen",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#151515",
+  "theme_color": "#087047",
+  "icons": []
+}
