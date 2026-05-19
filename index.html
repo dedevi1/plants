@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Pflanzen Controller</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="board">
+
+    <div class="leds">
+        <div id="redLed" class="led red off"></div>
+        <div id="greenLed" class="led green off"></div>
+    </div>
+
+    <h1>Pflanzen Controller</h1>
+
+    <div class="trace"></div>
+
+    <div class="panel">
+        <input id="plantInput" placeholder="Pflanze">
+        <input id="intervalInput" type="number" placeholder="Tage">
+        <input id="locationInput" placeholder="Standort">
+
+        <button onclick="addPlant()">Hinzufügen</button>
+        <button onclick="exportTxt()">TXT speichern</button>
+
+        <input
+            type="file"
+            id="fileInput"
+            accept=".txt"
+            onchange="importTxt()"
+        >
+    </div>
+
+    <ul id="plantList"></ul>
+
+</div>
+
+<script>
+
+function getPlants() {
+    return JSON.parse(localStorage.getItem("plants")) || []
+}
+
+function savePlants(plants) {
+    localStorage.setItem("plants", JSON.stringify(plants))
+}
+
+function addPlant() {
+
+    let name =
+        document.getElementById("plantInput").value
+
+    let interval =
+        document.getElementById("intervalInput").value
+
+    let location =
+        document.getElementById("locationInput").value
+
+    if (
+        name === "" ||
+        interval === "" ||
+        location === ""
+    ) {
+        alert("Bitte alles ausfüllen.")
+        return
+    }
+
+    let plants = getPlants()
+
+    plants.push({
+        name: name,
+        interval: Number(interval),
+        location: location,
+        watered: null
+    })
+
+    savePlants(plants)
+
+    document.getElementById("plantInput").value = ""
+    document.getElementById("intervalInput").value = ""
+    document.getElementById("locationInput").value = ""
+
+    showPlants()
+}
+
+function waterPlant(index) {
+
+    let plants = getPlants()
+
+    plants[index].watered =
+        new Date().toISOString().split("T")[0]
+
+    savePlants(plants)
+
+    showPlants()
+}
+
+function deletePlant(index) {
+
+    let plants = getPlants()
+
+    plants.splice(index, 1)
+
+    savePlants(plants)
+
+    showPlants()
+}
+
+function showPlants() {
+
+    let list =
+        document.getElementById("plantList")
+
+    list.innerHTML = ""
+
+    let plants = getPlants()
+
+    let needsWaterCount = 0
+
+    plants.forEach((plant, index) => {
+
+        let status = "Noch nie gegossen"
+
+        if (plant.watered) {
+
+            let last =
+                new Date(plant.watered)
+
+            let today =
+                new Date()
+
+            let diffDays =
+                Math.floor(
+                    (today - last)
+                    /
+                    (1000 * 60 * 60 * 24)
+                )
+
+            if (diffDays >= plant.interval) {
+
+                needsWaterCount++
+
+                status =
+                    "<span class='danger'>GIESSEN</span>"
+
+                if (
+                    diffDays >=
+                    plant.interval + 3
+                ) {
+                    alert(
+                        plant.name +
+                        " wurde lange nicht gegossen!"
+                    )
+                }
+
+            } else {
+
+                status =
+                    "<span class='good'>OK</span>"
+            }
+        }
+
+        list.innerHTML += `
+            <li class="plant-card">
+
+                <div class="plant-info">
+
+                    <b>${plant.name}</b>
+
+                    <br>
+
+                    Standort:
+                    ${plant.location}
+
+                    <br>
+
+                    Intervall:
+                    alle ${plant.interval} Tage
+
+                    <br>
+
+                    Zuletzt gegossen:
+                    ${plant.watered || "noch nie"}
+
+                    <br>
+
+                    Status:
+                    ${status}
+
+                </div>
+
+                <div class="plant-actions">
+
+                    <button
+                        onclick="waterPlant(${index})"
+                    >
+                        gegossen
+                    </button>
+
+                    <button
+                        onclick="deletePlant(${index})"
+                    >
+                        löschen
+                    </button>
+
+                </div>
+
+            </li>
+        `
+    })
+
+    let redLed =
+        document.getElementById("redLed")
+
+    let greenLed =
+        document.getElementById("greenLed")
+
+    if (needsWaterCount > 0) {
+
+        redLed.classList.remove("off")
+
+        greenLed.classList.add("off")
+
+    } else {
+
+        redLed.classList.add("off")
+
+        greenLed.classList.remove("off")
+    }
+}
+
+function exportTxt() {
+
+    let plants = getPlants()
+
+    let text = ""
+
+    plants.forEach(plant => {
+
+        text +=
+            `${plant.name}|` +
+            `${plant.interval}|` +
+            `${plant.location}|` +
+            `${plant.watered || ""}\n`
+    })
+
+    let blob =
+        new Blob([text], {
+            type: "text/plain"
+        })
+
+    let link =
+        document.createElement("a")
+
+    link.href =
+        URL.createObjectURL(blob)
+
+    link.download = "plants.txt"
+
+    link.click()
+}
+
+function importTxt() {
+
+    let file =
+        document.getElementById("fileInput").files[0]
+
+    if (!file) return
+
+    let reader = new FileReader()
+
+    reader.onload = function(event) {
+
+        let lines =
+            event.target.result.split("\n")
+
+        let plants = []
+
+        lines.forEach(line => {
+
+            if (line.trim() === "") return
+
+            let parts = line.split("|")
+
+            plants.push({
+                name: parts[0],
+                interval: Number(parts[1]),
+                location: parts[2],
+                watered: parts[3] || null
+            })
+        })
+
+        savePlants(plants)
+
+        showPlants()
+    }
+
+    reader.readAsText(file)
+}
+
+showPlants()
+
+</script>
+
+</body>
+</html>
