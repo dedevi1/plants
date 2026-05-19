@@ -4,10 +4,7 @@ body {
     font-family: Arial, sans-serif;
     color: #eafff3;
 }
-
-.plant-name {
-    color: lime;
-    
+   
 .board {
     max-width: 760px;
     margin: 20px auto;
@@ -133,6 +130,7 @@ ul {
 .plant-name {
     color: lime;
     font-weight: bold;
+    text-shadow: 0 0 8px lime;
     text-shadow: 0 0 8px lime;
     font-size: 20px;
 }
