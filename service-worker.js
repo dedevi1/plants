@@ -1,36 +1,161 @@
-const CACHE_NAME = "plants-cache-v2"
+body {
+    margin: 0;
+    background: #151515;
+    font-family: Arial, sans-serif;
+    color: #eafff3;
+}
 
-self.addEventListener("install", function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(function(cache) {
-            return cache.addAll([
-                "./",
-                "./index.html",
-                "./style.css?v=999",
-                "./manifest.json"
-            ])
-        })
-    )
-})
+.board {
+    max-width: 760px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #087047;
+    border-radius: 26px;
+    border: 6px solid #06452d;
+    box-shadow:
+        inset 0 0 25px rgba(255,255,255,0.08),
+        inset 0 0 60px rgba(0,0,0,0.35),
+        0 25px 60px rgba(0,0,0,0.8);
+    box-sizing: border-box;
+}
 
-self.addEventListener("activate", function(event) {
-    event.waitUntil(
-        caches.keys().then(function(names) {
-            return Promise.all(
-                names.map(function(name) {
-                    if (name !== CACHE_NAME) {
-                        return caches.delete(name)
-                    }
-                })
-            )
-        })
-    )
-})
+.trace {
+    height: 3px;
+    background: #d6b64c;
+    margin: 20px 0;
+    box-shadow: 0 0 6px #d6b64c;
+}
 
-self.addEventListener("fetch", function(event) {
-    event.respondWith(
-        fetch(event.request).catch(function() {
-            return caches.match(event.request)
-        })
-    )
-})
+.leds {
+    display: flex;
+    gap: 20px;
+    margin-left: 20px;
+}
+
+.led {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 3px solid #222;
+}
+
+.led.red {
+    background: red;
+    box-shadow: 0 0 18px red;
+}
+
+.led.green {
+    background: lime;
+    box-shadow: 0 0 18px lime;
+}
+
+.led.off {
+    background: #222;
+    box-shadow: none;
+}
+
+h1 {
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 24px;
+}
+
+.panel {
+    background: #063b28;
+    border: 2px solid #19ff9c;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    width: 100%;
+    background: #111;
+    color: lime;
+    border: 1px solid #19ff9c;
+    padding: 12px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    background: #222;
+    color: white;
+    border: 1px solid #aaa;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #333;
+}
+
+ul {
+    padding: 0;
+}
+
+.plant-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    list-style: none;
+    background: #052d1f;
+    border: 2px solid #d6b64c;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 14px 0;
+}
+
+.plant-info {
+    flex: 1;
+    line-height: 1.6;
+}
+
+.plant-name {
+    color: #A8FFCE;
+    font-weight: bold;
+    text-shadow:
+        0 0 6px #A8FFCE,
+        0 0 12px #7CFFB2,
+        0 0 20px #7CFFB2;
+    font-size: 20px;
+}
+
+.plant-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.danger {
+    color: red;
+    font-weight: bold;
+    text-shadow: 0 0 8px red;
+}
+
+.good {
+    color: lime;
+    font-weight: bold;
+    text-shadow: 0 0 8px lime;
+}
+
+@media (max-width: 600px) {
+    .board {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+}
+}
