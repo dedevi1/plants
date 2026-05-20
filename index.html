@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pflanzen Controller</title>
-    <link rel="stylesheet" href="style.css?v=3000">
+    <link rel="stylesheet" href="style.css?v=10000">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#087047">
 </head>
@@ -14,8 +14,7 @@
 
     <div class="leds">
         <div id="redLed" class="led red off"></div>
-		<div id="yellowLed" class="led yellow off"></div>
-		<div id="greenLed" class="led green off"></div>
+        <div id="greenLed" class="led green off"></div>
     </div>
 
     <h1>Pflanzen Controller</h1>
@@ -56,6 +55,13 @@
     <h2>Zimmerkarte</h2>
     <div id="roomMap" class="map"></div>
 
+    <div class="panel">
+        <h2>Zimmer löschen</h2>
+
+        <select id="deleteRoomInput"></select>
+        <button onclick="deleteRoom()">Zimmer löschen</button>
+    </div>
+
 </div>
 
 <script>
@@ -83,13 +89,16 @@ function saveRooms(rooms) {
 }
 
 function showRooms() {
-    let select = document.getElementById("locationInput")
+    let locationSelect = document.getElementById("locationInput")
+    let deleteSelect = document.getElementById("deleteRoomInput")
     let rooms = getRooms()
 
-    select.innerHTML = ""
+    locationSelect.innerHTML = ""
+    deleteSelect.innerHTML = ""
 
     rooms.forEach(room => {
-        select.innerHTML += `<option value="${room}">${room}</option>`
+        locationSelect.innerHTML += `<option value="${room}">${room}</option>`
+        deleteSelect.innerHTML += `<option value="${room}">${room}</option>`
     })
 }
 
@@ -113,6 +122,35 @@ function addRoom() {
     saveRooms(rooms)
 
     input.value = ""
+
+    showRooms()
+    showMap()
+}
+
+function deleteRoom() {
+    let roomToDelete = document.getElementById("deleteRoomInput").value
+
+    if (roomToDelete === "") {
+        alert("Bitte Zimmer auswählen.")
+        return
+    }
+
+    if (roomToDelete === "Wohnzimmer") {
+        alert("Wohnzimmer kann nicht gelöscht werden.")
+        return
+    }
+
+    let plants = getPlants()
+    let hasPlants = plants.some(plant => plant.location === roomToDelete)
+
+    if (hasPlants) {
+        alert("Dieses Zimmer enthält noch Pflanzen. Erst Pflanzen löschen.")
+        return
+    }
+
+    let rooms = getRooms().filter(room => room !== roomToDelete)
+
+    saveRooms(rooms)
 
     showRooms()
     showMap()
@@ -183,6 +221,7 @@ function getDaysSinceWatered(plant) {
 
 function getPlantStatus(plant) {
     let diffDays = getDaysSinceWatered(plant)
+    let interval = Number(plant.interval)
 
     if (diffDays === null) {
         return {
@@ -193,7 +232,7 @@ function getPlantStatus(plant) {
         }
     }
 
-    if (diffDays >= plant.interval) {
+    if (diffDays >= interval) {
         return {
             text: "GIESSEN",
             className: "danger",
@@ -202,7 +241,7 @@ function getPlantStatus(plant) {
         }
     }
 
-    if (diffDays === plant.interval - 1) {
+    if (interval > 1 && diffDays === interval - 1) {
         return {
             text: "Morgen gießen",
             className: "warning",
@@ -276,9 +315,7 @@ function showMap() {
     map.innerHTML = ""
 
     rooms.forEach(room => {
-        let roomPlants =
-            plants.filter(plant => plant.location === room)
-
+        let roomPlants = plants.filter(plant => plant.location === room)
         let plantHtml = ""
 
         roomPlants.forEach(plant => {
@@ -286,9 +323,7 @@ function showMap() {
 
             plantHtml += `
                 <div class="map-plant">
-                    <span class="plant-name">
-                        ${plant.name}
-                    </span><br>
+                    <span class="plant-name">${plant.name}</span><br>
 
                     <span class="${status.className}">
                         ${status.text}
@@ -298,8 +333,7 @@ function showMap() {
         })
 
         if (plantHtml === "") {
-            plantHtml =
-                `<div class="empty-room">Keine Pflanze</div>`
+            plantHtml = `<div class="empty-room">Keine Pflanze</div>`
         }
 
         map.innerHTML += `
@@ -313,25 +347,40 @@ function showMap() {
 
 function updateLeds(needsWaterCount, warningCount) {
     let redLed = document.getElementById("redLed")
-    let yellowLed = document.getElementById("yellowLed")
     let greenLed = document.getElementById("greenLed")
+    let plants = getPlants()
 
     redLed.classList.add("off")
-    yellowLed.classList.add("off")
     greenLed.classList.add("off")
+
+    redLed.style.background = ""
+    redLed.style.boxShadow = ""
+
+    if (plants.length === 0) {
+        return
+    }
 
     if (needsWaterCount > 0) {
         redLed.classList.remove("off")
-    } else if (warningCount > 0) {
-        yellowLed.classList.remove("off")
-    } else {
-        greenLed.classList.remove("off")
+        redLed.style.background = "red"
+        redLed.style.boxShadow = "0 0 18px red"
+        return
     }
+
+    if (warningCount > 0) {
+        redLed.classList.remove("off")
+        redLed.style.background = "yellow"
+        redLed.style.boxShadow = "0 0 18px yellow"
+        return
+    }
+
+    greenLed.classList.remove("off")
 }
 
 showRooms()
 showPlants()
 showMap()
 </script>
+
 </body>
 </html>
