@@ -4,383 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pflanzen Controller</title>
-    <link rel="stylesheet" href="style.css?v=10000">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#087047">
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="board">
+<div class="app">
 
-    <div class="leds">
+    <!-- STATUS -->
+    <div class="status-bar">
         <div id="redLed" class="led red off"></div>
         <div id="greenLed" class="led green off"></div>
     </div>
 
     <h1>Pflanzen Controller</h1>
 
-    <div class="trace"></div>
+    <!-- ZIMMERKARTE -->
+    <section>
+        <h2>Zimmerkarte</h2>
+        <div id="roomContainer"></div>
+    </section>
 
-    <h2>Zimmerkarte</h2>
-    <div id="roomMap" class="map"></div>
-    
-    <h2>Pflanzenliste</h2>
-    <ul id="plantList"></ul>
+    <!-- PFLANZENLISTE -->
+    <section>
+        <h2>Pflanzenliste</h2>
+        <input id="searchInput" placeholder="Suchen..." oninput="renderPlants()">
+        <div id="filterBar">
+            <button onclick="setFilter('all')">Alle</button>
+            <button onclick="setFilter('red')">Rot</button>
+            <button onclick="setFilter('yellow')">Gelb</button>
+            <button onclick="setFilter('green')">Grün</button>
+        </div>
+        <div id="plantList"></div>
+    </section>
 
-     <div class="panel">
+    <!-- PFLANZE HINZUFÜGEN -->
+    <section>
         <h2>Pflanze hinzufügen</h2>
 
-        <input id="plantInput" placeholder="Pflanzenname">
+        <input id="plantName" placeholder="Name">
 
-        <select id="intervalInput">
-            <option value="">Gießintervall auswählen</option>
-            <option value="1">jeden Tag</option>
-            <option value="2">alle 2 Tage</option>
-            <option value="3">alle 3 Tage</option>
-            <option value="5">alle 5 Tage</option>
-            <option value="7">jede Woche</option>
-            <option value="14">alle 2 Wochen</option>
-            <option value="30">einmal im Monat</option>
+        <select id="plantInterval">
+            <option value="">Intervall</option>
+            <option value="1">1 Tag</option>
+            <option value="2">2 Tage</option>
+            <option value="3">3 Tage</option>
+            <option value="7">7 Tage</option>
         </select>
 
-        <select id="locationInput"></select>
+        <select id="plantRoom"></select>
 
-        <button onclick="addPlant()">Pflanze hinzufügen</button>
-    </div>
+        <button onclick="addPlant()">Hinzufügen</button>
+    </section>
 
-    <div class="panel">
-        <h2>Neues Zimmer hinzufügen</h2>
+    <!-- ZIMMER -->
+    <section>
+        <h2>Zimmer hinzufügen</h2>
+        <input id="roomName" placeholder="Zimmername">
+        <button onclick="addRoom()">Hinzufügen</button>
+    </section>
 
-        <input id="newRoomInput" placeholder="z. B. Küche, Bad, Balkon">
-        <button onclick="addRoom()">Zimmer hinzufügen</button>
-    </div>
-    
-    <div class="panel">
+    <section>
         <h2>Zimmer löschen</h2>
-
-        <select id="deleteRoomInput"></select>
-        <button onclick="deleteRoom()">Zimmer löschen</button>
-    </div>
+        <select id="deleteRoom"></select>
+        <button onclick="deleteRoom()">Löschen</button>
+    </section>
 
 </div>
 
-<script>
-function getPlants() {
-    return JSON.parse(localStorage.getItem("plants")) || []
-}
-
-function savePlants(plants) {
-    localStorage.setItem("plants", JSON.stringify(plants))
-}
-
-function getRooms() {
-    let rooms = JSON.parse(localStorage.getItem("rooms"))
-
-    if (!rooms || rooms.length === 0) {
-        rooms = ["Wohnzimmer"]
-        saveRooms(rooms)
-    }
-
-    return rooms
-}
-
-function saveRooms(rooms) {
-    localStorage.setItem("rooms", JSON.stringify(rooms))
-}
-
-function showRooms() {
-    let locationSelect = document.getElementById("locationInput")
-    let deleteSelect = document.getElementById("deleteRoomInput")
-    let rooms = getRooms()
-
-    locationSelect.innerHTML = ""
-    deleteSelect.innerHTML = ""
-
-    rooms.forEach(room => {
-        locationSelect.innerHTML += `<option value="${room}">${room}</option>`
-        deleteSelect.innerHTML += `<option value="${room}">${room}</option>`
-    })
-}
-
-function addRoom() {
-    let input = document.getElementById("newRoomInput")
-    let room = input.value.trim()
-
-    if (room === "") {
-        alert("Bitte Zimmername eingeben.")
-        return
-    }
-
-    let rooms = getRooms()
-
-    if (rooms.includes(room)) {
-        alert("Dieses Zimmer gibt es schon.")
-        return
-    }
-
-    rooms.push(room)
-    saveRooms(rooms)
-
-    input.value = ""
-
-    showRooms()
-    showMap()
-}
-
-function deleteRoom() {
-    let roomToDelete = document.getElementById("deleteRoomInput").value
-
-    if (roomToDelete === "") {
-        alert("Bitte Zimmer auswählen.")
-        return
-    }
-
-    if (roomToDelete === "Wohnzimmer") {
-        alert("Wohnzimmer kann nicht gelöscht werden.")
-        return
-    }
-
-    let plants = getPlants()
-    let hasPlants = plants.some(plant => plant.location === roomToDelete)
-
-    if (hasPlants) {
-        alert("Dieses Zimmer enthält noch Pflanzen. Erst Pflanzen löschen.")
-        return
-    }
-
-    let rooms = getRooms().filter(room => room !== roomToDelete)
-
-    saveRooms(rooms)
-
-    showRooms()
-    showMap()
-}
-
-function addPlant() {
-    let name = document.getElementById("plantInput").value.trim()
-    let interval = document.getElementById("intervalInput").value
-    let location = document.getElementById("locationInput").value
-
-    if (name === "" || interval === "" || location === "") {
-        alert("Bitte Pflanzenname, Gießintervall und Zimmer auswählen.")
-        return
-    }
-
-    let plants = getPlants()
-
-    plants.push({
-        name: name,
-        interval: Number(interval),
-        location: location,
-        watered: null
-    })
-
-    savePlants(plants)
-
-    document.getElementById("plantInput").value = ""
-    document.getElementById("intervalInput").value = ""
-
-    showPlants()
-    showMap()
-}
-
-function waterPlant(index) {
-    let plants = getPlants()
-
-    plants[index].watered = new Date().toISOString().split("T")[0]
-
-    savePlants(plants)
-
-    showPlants()
-    showMap()
-}
-
-function deletePlant(index) {
-    let plants = getPlants()
-
-    plants.splice(index, 1)
-
-    savePlants(plants)
-
-    showPlants()
-    showMap()
-}
-
-function getDaysSinceWatered(plant) {
-    if (!plant.watered) {
-        return null
-    }
-
-    let last = new Date(plant.watered)
-    let today = new Date()
-
-    return Math.floor(
-        (today - last) / (1000 * 60 * 60 * 24)
-    )
-}
-
-function getPlantStatus(plant) {
-    let diffDays = getDaysSinceWatered(plant)
-    let interval = Number(plant.interval)
-
-    if (diffDays === null) {
-        return {
-            text: "Noch nie gegossen",
-            className: "danger",
-            needsWater: true,
-            warning: false
-        }
-    }
-
-    if (diffDays >= interval) {
-        return {
-            text: "GIESSEN",
-            className: "danger",
-            needsWater: true,
-            warning: false
-        }
-    }
-
-    if (interval > 1 && diffDays === interval - 1) {
-        return {
-            text: "Morgen gießen",
-            className: "warning",
-            needsWater: false,
-            warning: true
-        }
-    }
-
-    return {
-        text: "OK",
-        className: "good",
-        needsWater: false,
-        warning: false
-    }
-}
-
-function showPlants() {
-    let list = document.getElementById("plantList")
-    list.innerHTML = ""
-
-    let plants = getPlants()
-
-    let needsWaterCount = 0
-    let warningCount = 0
-
-    plants.forEach((plant, index) => {
-        let status = getPlantStatus(plant)
-
-        if (status.needsWater) {
-            needsWaterCount++
-        }
-
-        if (status.warning) {
-            warningCount++
-        }
-
-        list.innerHTML += `
-            <li class="plant-card">
-                <div class="plant-info">
-                    <span class="plant-name">${plant.name}</span><br>
-                    Zimmer: ${plant.location}<br>
-                    Intervall: alle ${plant.interval} Tage<br>
-                    Zuletzt gegossen: ${plant.watered || "noch nie"}<br>
-                    Status:
-                    <span class="${status.className}">
-                        ${status.text}
-                    </span>
-                </div>
-
-                <div class="plant-actions">
-                    <button onclick="waterPlant(${index})">
-                        gegossen
-                    </button>
-
-                    <button onclick="deletePlant(${index})">
-                        löschen
-                    </button>
-                </div>
-            </li>
-        `
-    })
-
-    updateLeds(needsWaterCount, warningCount)
-}
-
-function showMap() {
-    let map = document.getElementById("roomMap")
-    let rooms = getRooms()
-    let plants = getPlants()
-
-    map.innerHTML = ""
-
-    rooms.forEach(room => {
-        let roomPlants = plants.filter(plant => plant.location === room)
-        let plantHtml = ""
-
-        roomPlants.forEach(plant => {
-            let status = getPlantStatus(plant)
-
-            plantHtml += `
-                <div class="map-plant">
-                    <span class="plant-name">${plant.name}</span><br>
-
-                    <span class="${status.className}">
-                        ${status.text}
-                    </span>
-                </div>
-            `
-        })
-
-        if (plantHtml === "") {
-            plantHtml = `<div class="empty-room">Keine Pflanze</div>`
-        }
-
-        map.innerHTML += `
-            <div class="room">
-                <div class="room-title">${room}</div>
-                ${plantHtml}
-            </div>
-        `
-    })
-}
-
-function updateLeds(needsWaterCount, warningCount) {
-    let redLed = document.getElementById("redLed")
-    let greenLed = document.getElementById("greenLed")
-    let plants = getPlants()
-
-    redLed.classList.add("off")
-    greenLed.classList.add("off")
-
-    redLed.style.background = ""
-    redLed.style.boxShadow = ""
-
-    if (plants.length === 0) {
-        return
-    }
-
-    if (needsWaterCount > 0) {
-        redLed.classList.remove("off")
-        redLed.style.background = "red"
-        redLed.style.boxShadow = "0 0 18px red"
-        return
-    }
-
-    if (warningCount > 0) {
-        redLed.classList.remove("off")
-        redLed.style.background = "yellow"
-        redLed.style.boxShadow = "0 0 18px yellow"
-        return
-    }
-
-    greenLed.classList.remove("off")
-}
-
-showRooms()
-showPlants()
-showMap()
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
