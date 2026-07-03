@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pflanzen Controller</title>
-    <link rel="stylesheet" href="style.css?v=11000">
+    <link rel="stylesheet" href="style.css?v=12000">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#087047">
 </head>
@@ -25,20 +25,20 @@
     <div id="roomMap" class="map"></div>
 
     <div class="panel">
-    <h2>Pflanzen suchen</h2>
+        <h2>Pflanzen suchen</h2>
 
-    <input
-        id="searchInput"
-        placeholder="Pflanze suchen..."
-        oninput="showPlants()"
-    >
+        <input
+            id="searchInput"
+            placeholder="Pflanze suchen..."
+            oninput="showPlants()"
+        >
 
-    <button onclick="setFilter('all')">Alle</button>
-    <button onclick="setFilter('red')">Rot</button>
-    <button onclick="setFilter('yellow')">Gelb</button>
-    <button onclick="setFilter('green')">Grün</button>
+        <button onclick="setFilter('all')">Alle</button>
+        <button onclick="setFilter('red')">Rot</button>
+        <button onclick="setFilter('yellow')">Gelb</button>
+        <button onclick="setFilter('green')">Grün</button>
     </div>
-    
+
     <h2>Pflanzenliste</h2>
     <ul id="plantList"></ul>
 
@@ -84,6 +84,7 @@ function setFilter(filter) {
     currentFilter = filter
     showPlants()
 }
+
 function getPlants() {
     return JSON.parse(localStorage.getItem("plants")) || []
 }
@@ -280,6 +281,8 @@ function showPlants() {
     list.innerHTML = ""
 
     let plants = getPlants()
+    let searchText = document.getElementById("searchInput").value.toLowerCase()
+
     let needsWaterCount = 0
     let warningCount = 0
 
@@ -288,6 +291,20 @@ function showPlants() {
 
         if (status.needsWater) needsWaterCount++
         if (status.warning) warningCount++
+
+        let matchesSearch =
+            plant.name.toLowerCase().includes(searchText) ||
+            plant.location.toLowerCase().includes(searchText)
+
+        let matchesFilter =
+            currentFilter === "all" ||
+            (currentFilter === "red" && status.needsWater) ||
+            (currentFilter === "yellow" && status.warning) ||
+            (currentFilter === "green" && !status.needsWater && !status.warning)
+
+        if (!matchesSearch || !matchesFilter) {
+            return
+        }
 
         list.innerHTML += `
             <li class="plant-card">
@@ -322,6 +339,13 @@ function showMap() {
 
     rooms.forEach(room => {
         let roomPlants = plants.filter(plant => plant.location === room)
+        let redCount = roomPlants.filter(p => getPlantStatus(p).needsWater).length
+        let yellowCount = roomPlants.filter(p => getPlantStatus(p).warning).length
+        let greenCount = roomPlants.filter(p => {
+            let status = getPlantStatus(p)
+            return !status.needsWater && !status.warning
+        }).length
+
         let plantHtml = ""
 
         roomPlants.forEach(plant => {
@@ -343,7 +367,10 @@ function showMap() {
 
         map.innerHTML += `
             <div class="room">
-                <div class="room-title">${room} (${roomPlants.length})</div>
+                <div class="room-title">
+                    ${room} (${roomPlants.length})<br>
+                    🔴 ${redCount} 🟡 ${yellowCount} 🟢 ${greenCount}
+                </div>
                 ${plantHtml}
             </div>
         `
