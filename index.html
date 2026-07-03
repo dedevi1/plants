@@ -24,6 +24,21 @@
     <h2>Zimmerkarte</h2>
     <div id="roomMap" class="map"></div>
 
+    <div class="panel">
+    <h2>Pflanzen suchen</h2>
+
+    <input
+        id="searchInput"
+        placeholder="Pflanze suchen..."
+        oninput="showPlants()"
+    >
+
+    <button onclick="setFilter('all')">Alle</button>
+    <button onclick="setFilter('red')">Rot</button>
+    <button onclick="setFilter('yellow')">Gelb</button>
+    <button onclick="setFilter('green')">Grün</button>
+    </div>
+    
     <h2>Pflanzenliste</h2>
     <ul id="plantList"></ul>
 
@@ -63,6 +78,12 @@
 </div>
 
 <script>
+let currentFilter = "all"
+
+function setFilter(filter) {
+    currentFilter = filter
+    showPlants()
+}
 function getPlants() {
     return JSON.parse(localStorage.getItem("plants")) || []
 }
