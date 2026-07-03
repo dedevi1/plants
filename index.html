@@ -9,42 +9,60 @@
     <meta name="theme-color" content="#087047">
 </head>
 <body>
-
+<!-- Hauptplatine -->
 <div class="board">
-
+    <!-- ========================= -->
+    <!-- Status LEDs -->
+    <!-- Rot = Heute gießen -->
+    <!-- Gelb = Morgen gießen -->
+    <!-- Grün = Alles OK -->
+    <!-- ========================= -->
     <div class="leds">
         <div id="redLed" class="led red off"></div>
         <div id="greenLed" class="led green off"></div>
     </div>
-
+    <!-- Hauptüberschrift -->
     <h1>Pflanzen Controller</h1>
-
+    <!-- Leiterbahn -->
     <div class="trace"></div>
-
+     <!-- ========================= -->
+    <!-- Zimmerkarte -->
+    <!-- Zeigt alle Zimmer -->
+    <!-- mit den enthaltenen Pflanzen -->
+    <!-- ========================= -->
     <h2>Zimmerkarte</h2>
     <div id="roomMap" class="map"></div>
-
+     <!-- ========================= -->
+    <!-- Pflanzensuche -->
+    <!-- Suche nach Pflanzenname -->
+    <!-- oder Zimmer -->
+    <!-- ========================= -->
     <div class="panel">
         <h2>Pflanzen filtern</h2>
-
+        <!-- Suchfeld -->
         <input
             id="searchInput"
             placeholder="Pflanze suchen..."
-            oninput="showPlants()"
-        >
-
+            oninput="showPlants()">
+        <!-- Filter -->
         <div class="filter-buttons">
-            <button onclick="setFilter('all')">Alle</button>
+            <button onclick="setFilter('all')">Alle</button> 
             <button onclick="setFilter('red')">Rot</button>
             <button onclick="setFilter('yellow')">Gelb</button>
             <button onclick="setFilter('green')">Grün</button>
         </div>
     </div>
-
+    <!-- ========================= -->
+    <!-- Pflanzenliste -->
+    <!-- Alle gespeicherten Pflanzen -->
+    <!-- ========================= -->
     <h2>Pflanzenliste</h2>
     <ul id="plantList"></ul>
 
     <div class="panel">
+        <!-- ========================= -->
+        <!-- Neue Pflanze hinzufügen -->
+        <!-- ========================= -->
         <h2>Pflanze hinzufügen</h2>
 
         <input id="plantInput" placeholder="Pflanzenname">
@@ -59,18 +77,24 @@
             <option value="14">alle 2 Wochen</option>
             <option value="30">einmal im Monat</option>
         </select>
-
+        <!-- Zimmer auswählen -->
         <select id="locationInput"></select>
-
+        <!-- Pflanze speichern -->
         <button onclick="addPlant()">Pflanze hinzufügen</button>
     </div>
-
+    <!-- ========================= -->
+    <!-- Neues Zimmer -->
+    <!-- ========================= -->
     <div class="panel">
         <h2>Zimmer hinzufügen</h2>
         <input id="newRoomInput" placeholder="z. B. Küche, Bad, Balkon">
         <button onclick="addRoom()">Zimmer hinzufügen</button>
     </div>
-
+    <!-- ========================= -->
+    <!-- Zimmer löschen -->
+    <!-- Nur möglich wenn -->
+    <!-- keine Pflanzen darin sind -->
+    <!-- ========================= -->
     <div class="panel">
         <h2>Zimmer löschen</h2>
         <select id="deleteRoomInput"></select>
