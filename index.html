@@ -261,7 +261,7 @@ function getPlantStatus(plant) {
         }
     }
 
-    if (interval > 1 && diffDays === interval - 1) {
+    if (interval >= 1 && diffDays === interval - 1) {
         return {
             text: "Morgen gießen",
             className: "warning",
