@@ -150,8 +150,7 @@ ul {
     color: #B8FFD7;
     font-weight: bold;
     text-shadow:
-        0 0 2px #B8FFD7,
-        0 0 5px #7CFFB2;
+        0 0 1px rgba(124,255,178,0.35);
 }
 
 .warning {
@@ -181,10 +180,34 @@ ul {
 }
 
 .room-title {
-    color: #B8FFD7;
+    color: #C8FFE0;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
-    text-shadow: 0 0 3px #7CFFB2;
+    text-shadow:
+        0 0 1px #7CFFB2,
+        0 0 3px rgba(124,255,178,0.35);
+}
+
+.room-status {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.red-count {
+    color: #ff6666;
+}
+
+.yellow-count {
+    color: #ffd84d;
+}
+
+.green-count {
+    color: #8dffb2;
 }
 
 .map-plant {
