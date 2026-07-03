@@ -143,16 +143,15 @@ ul {
 .danger {
     color: red;
     font-weight: bold;
-    text-shadow: 0 0 8px red;
+    text-shadow: 0 0 6px red;
 }
 
 .good {
-    color: #A8FFCE;
+    color: #B8FFD7;
     font-weight: bold;
     text-shadow:
-        0 0 6px #A8FFCE,
-        0 0 12px #7CFFB2,
-        0 0 20px #7CFFB2;
+        0 0 2px #B8FFD7,
+        0 0 5px #7CFFB2;
 }
 
 .warning {
@@ -164,7 +163,6 @@ ul {
 .map-plant:has(.warning) {
     border-color: yellow;
 }
-
 
 .map {
     display: grid;
@@ -183,10 +181,10 @@ ul {
 }
 
 .room-title {
-    color: #A8FFCE;
+    color: #B8FFD7;
     font-weight: bold;
     margin-bottom: 10px;
-    text-shadow: 0 0 8px #7CFFB2;
+    text-shadow: 0 0 3px #7CFFB2;
 }
 
 .map-plant {
@@ -203,16 +201,45 @@ ul {
     font-size: 14px;
 }
 
-.led.yellow {
-    background: yellow;
-    box-shadow: 0 0 18px yellow;
-}
-
 .room,
 .map-plant,
 .plant-card {
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+/* Filter-Buttons nebeneinander + farbig */
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.filter-buttons button {
+    flex: 1;
+    width: auto;
+    margin: 0;
+    font-weight: bold;
+}
+
+.filter-buttons button:nth-child(1) {
+    color: white;
+    border: 1px solid #888;
+}
+
+.filter-buttons button:nth-child(2) {
+    color: #ff5b5b;
+    border: 1px solid #ff5b5b;
+}
+
+.filter-buttons button:nth-child(3) {
+    color: #ffd94d;
+    border: 1px solid #ffd94d;
+}
+
+.filter-buttons button:nth-child(4) {
+    color: #6cff8b;
+    border: 1px solid #6cff8b;
 }
 
 @media (max-width: 600px) {
@@ -224,16 +251,4 @@ ul {
     h1 {
         font-size: 20px;
     }
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.filter-buttons button {
-    flex: 1;
-    width: auto;
-    margin: 0;
 }
